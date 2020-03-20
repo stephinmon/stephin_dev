@@ -15,7 +15,7 @@ dynamodb = boto3.resource('dynamodb')
 
 # insert_data function for inserting data into dynamodb table
 def insert_data(recList):
-    table = dynamodb.Table('employee')
+    table = dynamodb.Table('employee') # pylint: disable=E1101
     for i in range(len(recList)):
         record = recList[i]
         table.put_item(
@@ -26,9 +26,10 @@ def insert_data(recList):
         )   
 
 # lambda_handler is the main function in lambda function
+# added in .parse in the key as unquote_plus first needs to parse.
 def lambda_handler(event,context):
     source_bucket = event['Records'][0]['s3']['bucket']['name']
-    key = urllib.unquote_plus(event['Records'][0]['s3']['object']['key'])
+    key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'])
     copy_source = {'Bucket':source_bucket , 'Key':key}
     print(event)
     
@@ -43,7 +44,7 @@ def lambda_handler(event,context):
         waiter = s3.get_waiter('object_exists')
         waiter.wait(Bucket=source_bucket, Key=key)
         print("Accessing the receied file and reading the same")
-        bucket = tests3.Bucket(u'awslambdas3test2')
+        bucket = tests3.Bucket(u'awslambdas3test2') # pylint: disable=E1101
         obj = bucket.Object(key='inputfile.csv')
         response = obj.get()
         print("response from file object")
